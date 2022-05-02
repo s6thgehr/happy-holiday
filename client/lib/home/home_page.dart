@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:client/auth/connect_wallet_button.dart';
+import 'package:client/auth/presentation/connect_wallet_button.dart';
 import 'package:client/core/contents.dart';
 import 'package:client/core/responsive.dart';
 import 'package:flutter/material.dart';
