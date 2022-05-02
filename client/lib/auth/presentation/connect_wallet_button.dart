@@ -11,7 +11,9 @@ class ConnectWalletButton extends StatelessWidget {
         vertical: 8,
       ),
       child: TextButton(
-        onPressed: () {},
+        onPressed: () {
+          print('Hello');
+        },
         style: ButtonStyle(
           backgroundColor:
               MaterialStateProperty.all<Color>(Colors.pink.shade700),
