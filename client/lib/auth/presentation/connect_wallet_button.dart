@@ -40,21 +40,27 @@ class ConnectWalletButton extends ConsumerWidget {
           ),
           child: Center(
             child: ref.watch(authNotifierProvider).maybeMap(
-                orElse: () {
-                  return null;
-                },
-                authenticated: (_) => const Text(
-                      'You are signed in',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                unauthenticated: (_) => const Text(
+                  orElse: () {
+                    return const Text(
                       'Connect Wallet',
                       style: TextStyle(
                         color: Colors.white,
                       ),
-                    )),
+                    );
+                  },
+                  authenticated: (_) => const Text(
+                    'You are signed in',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  unauthenticated: (_) => const Text(
+                    'Connect Wallet',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
           ),
         ),
       ),

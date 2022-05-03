@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:client/auth/application/auth_notifier.dart';
+import 'package:client/auth/domain/auth_failure.dart';
 import 'package:client/auth/presentation/connect_wallet_button.dart';
 import 'package:client/auth/shared/providers.dart';
 import 'package:client/core/contents.dart';
@@ -36,6 +37,26 @@ class HomePageDesktop extends ConsumerWidget {
                   title: const Text('You are signed in'),
                   content: const Text(
                       'Welcome to Happy Holiday. You can now use all functions on this website.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              });
+        } else if (next ==
+            const AuthState.failure(
+                AuthFailure.metaMask("MetaMask is not available."))) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Metamask is not available'),
+                  content: const Text(
+                      'You need a MetaMask extension to use this website.'),
                   actions: [
                     TextButton(
                       onPressed: () {
