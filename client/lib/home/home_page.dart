@@ -1,8 +1,11 @@
 import 'dart:ui';
+import 'package:client/auth/application/auth_notifier.dart';
 import 'package:client/auth/presentation/connect_wallet_button.dart';
+import 'package:client/auth/shared/providers.dart';
 import 'package:client/core/contents.dart';
 import 'package:client/core/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class HomePage extends StatelessWidget {
@@ -16,12 +19,36 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class HomePageDesktop extends StatelessWidget {
+class HomePageDesktop extends ConsumerWidget {
   const HomePageDesktop({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
+    ref.listen(
+      authNotifierProvider,
+      ((previous, next) {
+        if (next == const AuthState.authenticated()) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('You are signed in'),
+                  content: const Text(
+                      'Welcome to Happy Holiday. You can now use all functions on this website.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              });
+        }
+      }),
+    );
 
     return Scaffold(
       extendBodyBehindAppBar: true,

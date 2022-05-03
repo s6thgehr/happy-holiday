@@ -1,18 +1,21 @@
+import 'package:client/auth/shared/providers.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:flutter/material.dart';
 
-class ConnectWalletButton extends StatelessWidget {
+class ConnectWalletButton extends ConsumerWidget {
   const ConnectWalletButton({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 32,
         vertical: 8,
       ),
       child: TextButton(
-        onPressed: () {
-          print('Hello');
+        onPressed: () async {
+          ref.read(authNotifierProvider.notifier).signIn();
         },
         style: ButtonStyle(
           backgroundColor:
@@ -30,18 +33,29 @@ class ConnectWalletButton extends StatelessWidget {
             },
           ),
         ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 8,
           ),
           child: Center(
-              child: Text(
-            'Connect Wallet',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          )),
+            child: ref.watch(authNotifierProvider).maybeMap(
+                orElse: () {
+                  return null;
+                },
+                authenticated: (_) => const Text(
+                      'You are signed in',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                unauthenticated: (_) => const Text(
+                      'Connect Wallet',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    )),
+          ),
         ),
       ),
     );

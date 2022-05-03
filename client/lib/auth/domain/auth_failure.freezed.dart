@@ -16,37 +16,42 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$AuthFailure {
+  String? get message => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() metamask,
+    required TResult Function(String? message) metaMask,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? metamask,
+    TResult Function(String? message)? metaMask,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? metamask,
+    TResult Function(String? message)? metaMask,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Metamask value) metamask,
+    required TResult Function(_MetaMask value) metaMask,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Metamask value)? metamask,
+    TResult Function(_MetaMask value)? metaMask,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Metamask value)? metamask,
+    TResult Function(_MetaMask value)? metaMask,
     required TResult orElse(),
   }) =>
+      throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $AuthFailureCopyWith<AuthFailure> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -55,6 +60,7 @@ abstract class $AuthFailureCopyWith<$Res> {
   factory $AuthFailureCopyWith(
           AuthFailure value, $Res Function(AuthFailure) then) =
       _$AuthFailureCopyWithImpl<$Res>;
+  $Res call({String? message});
 }
 
 /// @nodoc
@@ -64,67 +70,104 @@ class _$AuthFailureCopyWithImpl<$Res> implements $AuthFailureCopyWith<$Res> {
   final AuthFailure _value;
   // ignore: unused_field
   final $Res Function(AuthFailure) _then;
-}
-
-/// @nodoc
-abstract class _$MetamaskCopyWith<$Res> {
-  factory _$MetamaskCopyWith(_Metamask value, $Res Function(_Metamask) then) =
-      __$MetamaskCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$MetamaskCopyWithImpl<$Res> extends _$AuthFailureCopyWithImpl<$Res>
-    implements _$MetamaskCopyWith<$Res> {
-  __$MetamaskCopyWithImpl(_Metamask _value, $Res Function(_Metamask) _then)
-      : super(_value, (v) => _then(v as _Metamask));
 
   @override
-  _Metamask get _value => super._value as _Metamask;
+  $Res call({
+    Object? message = freezed,
+  }) {
+    return _then(_value.copyWith(
+      message: message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+abstract class _$MetaMaskCopyWith<$Res> implements $AuthFailureCopyWith<$Res> {
+  factory _$MetaMaskCopyWith(_MetaMask value, $Res Function(_MetaMask) then) =
+      __$MetaMaskCopyWithImpl<$Res>;
+  @override
+  $Res call({String? message});
+}
+
+/// @nodoc
+class __$MetaMaskCopyWithImpl<$Res> extends _$AuthFailureCopyWithImpl<$Res>
+    implements _$MetaMaskCopyWith<$Res> {
+  __$MetaMaskCopyWithImpl(_MetaMask _value, $Res Function(_MetaMask) _then)
+      : super(_value, (v) => _then(v as _MetaMask));
+
+  @override
+  _MetaMask get _value => super._value as _MetaMask;
+
+  @override
+  $Res call({
+    Object? message = freezed,
+  }) {
+    return _then(_MetaMask(
+      message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
 /// @nodoc
 
-class _$_Metamask extends _Metamask {
-  const _$_Metamask() : super._();
+class _$_MetaMask extends _MetaMask {
+  const _$_MetaMask([this.message]) : super._();
+
+  @override
+  final String? message;
 
   @override
   String toString() {
-    return 'AuthFailure.metamask()';
+    return 'AuthFailure.metaMask(message: $message)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _Metamask);
+        (other.runtimeType == runtimeType &&
+            other is _MetaMask &&
+            const DeepCollectionEquality().equals(other.message, message));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(message));
+
+  @JsonKey(ignore: true)
+  @override
+  _$MetaMaskCopyWith<_MetaMask> get copyWith =>
+      __$MetaMaskCopyWithImpl<_MetaMask>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() metamask,
+    required TResult Function(String? message) metaMask,
   }) {
-    return metamask();
+    return metaMask(message);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? metamask,
+    TResult Function(String? message)? metaMask,
   }) {
-    return metamask?.call();
+    return metaMask?.call(message);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? metamask,
+    TResult Function(String? message)? metaMask,
     required TResult orElse(),
   }) {
-    if (metamask != null) {
-      return metamask();
+    if (metaMask != null) {
+      return metaMask(message);
     }
     return orElse();
   }
@@ -132,33 +175,40 @@ class _$_Metamask extends _Metamask {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Metamask value) metamask,
+    required TResult Function(_MetaMask value) metaMask,
   }) {
-    return metamask(this);
+    return metaMask(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Metamask value)? metamask,
+    TResult Function(_MetaMask value)? metaMask,
   }) {
-    return metamask?.call(this);
+    return metaMask?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Metamask value)? metamask,
+    TResult Function(_MetaMask value)? metaMask,
     required TResult orElse(),
   }) {
-    if (metamask != null) {
-      return metamask(this);
+    if (metaMask != null) {
+      return metaMask(this);
     }
     return orElse();
   }
 }
 
-abstract class _Metamask extends AuthFailure {
-  const factory _Metamask() = _$_Metamask;
-  const _Metamask._() : super._();
+abstract class _MetaMask extends AuthFailure {
+  const factory _MetaMask([final String? message]) = _$_MetaMask;
+  const _MetaMask._() : super._();
+
+  @override
+  String? get message => throw _privateConstructorUsedError;
+  @override
+  @JsonKey(ignore: true)
+  _$MetaMaskCopyWith<_MetaMask> get copyWith =>
+      throw _privateConstructorUsedError;
 }

@@ -4,5 +4,5 @@ part 'auth_failure.freezed.dart';
 @freezed
 abstract class AuthFailure with _$AuthFailure {
   const AuthFailure._();
-  const factory AuthFailure.metamask() = _Metamask;
+  const factory AuthFailure.metaMask([String? message]) = _MetaMask;
 }
