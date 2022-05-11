@@ -12,6 +12,7 @@ contract HappyHoliday is ChainlinkClient {
     uint256 public fee;
 
     event TotalRain(uint256 _result);
+    event RequestRain(uint256 _request);
 
     uint256 public constant DECIMALS = 10**18;
     uint256 public insuredValue;
@@ -40,6 +41,7 @@ contract HappyHoliday is ChainlinkClient {
         req.add("method", "SUM");
         req.add("column", "prcp");
         sendChainlinkRequest(req, fee);
+        emit RequestRain(fee);
     }
 
     function fulfillTotalRain(bytes32 _requestId, uint256 _result)
