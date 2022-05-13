@@ -8,25 +8,34 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
 
-    uint256 private constant ORACLE_PAYMENT = 0 * LINK_DIVISIBILITY;
-    uint256 public currentPercipitation;
-    address private _oracle = 0x9904415Db0B70fDd242b6Fe835d2bBc155466e8e;
-    bytes32 private _jobId = "69cf5186b05a4497be74f85236e8ba34";
+    // uint256 private constant ORACLE_PAYMENT = 0 * LINK_DIVISIBILITY;
+    // uint256 public currentPercipitation;
+    // address private _oracle = 0x9904415Db0B70fDd242b6Fe835d2bBc155466e8e;
+    // bytes32 private _jobId = "69cf5186b05a4497be74f85236e8ba34";
 
-    event RequestPercipitationFulfilled(
-        bytes32 indexed requestId,
-        uint256 indexed price
-    );
+    bytes32 public weatherJobId;
+    uint256 public rainPast24h;
+    uint256 public fee;
 
-    constructor() ConfirmedOwner(msg.sender) {
-        setPublicChainlinkToken();
+    event RequestRainFulfilled(bytes32 indexed requestId, uint256 indexed rain);
+
+    constructor(
+        address _link,
+        address _oracle,
+        bytes32 _weatherJobId,
+        uint256 _fee
+    ) ConfirmedOwner(msg.sender) {
+        setChainlinkToken(_link);
+        setChainlinkOracle(_oracle);
+        weatherJobId = _weatherJobId;
+        fee = _fee;
     }
 
-    function requestPercipitation() public onlyOwner {
+    function requestRainPast24h() public onlyOwner {
         Chainlink.Request memory req = buildChainlinkRequest(
-            _jobId,
+            weatherJobId,
             address(this),
-            this.fulfillPercipitation.selector
+            this.fulfillRainPast24h.selector
         );
         req.add(
             "get",
@@ -34,15 +43,15 @@ contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
         );
         req.add("path", "0,PrecipitationSummary,Past24Hours,Metric,Value");
         req.addInt("times", 1000);
-        sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
+        sendChainlinkRequest(req, fee);
     }
 
-    function fulfillPercipitation(bytes32 _requestId, uint256 _Percipitation)
+    function fulfillRainPast24h(bytes32 _requestId, uint256 _rainPast24h)
         public
         recordChainlinkFulfillment(_requestId)
     {
-        emit RequestPercipitationFulfilled(_requestId, _Percipitation);
-        currentPercipitation = _Percipitation;
+        emit RequestRainFulfilled(_requestId, _rainPast24h);
+        rainPast24h = _rainPast24h;
     }
 
     function stringToBytes32(string memory source)

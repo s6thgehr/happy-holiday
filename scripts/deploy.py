@@ -9,11 +9,15 @@ from web3 import Web3
 def main():
     account = get_account()
     happy_holiday = HappyHoliday.deploy(
+        get_contract("link_token").address,
+        get_contract("oracle").address,
+        Web3.toHex(text=config["networks"][network.show_active()]["total_rain_job"]),
+        config["networks"][network.show_active()]["fee"],
         {"from": account},
         publish_source=False,
     )
-    print(f"Current rain is {happy_holiday.currentPercipitation()}")
-    tx = happy_holiday.requestPercipitation({"from": account})
+    print(f"Current rain is {happy_holiday.rainPast24h()}")
+    tx = happy_holiday.requestRainPast24h({"from": account})
     tx.wait(1)
     time.sleep(60)
-    print(f"Current rain is {happy_holiday.currentPercipitation()}")
+    print(f"Current rain is {happy_holiday.rainPast24h()}")
