@@ -8,16 +8,17 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
 
-    // uint256 private constant ORACLE_PAYMENT = 0 * LINK_DIVISIBILITY;
-    // uint256 public currentPercipitation;
-    // address private _oracle = 0x9904415Db0B70fDd242b6Fe835d2bBc155466e8e;
-    // bytes32 private _jobId = "69cf5186b05a4497be74f85236e8ba34";
-
     bytes32 public weatherJobId;
-    uint256 public rainPast24h;
     uint256 public fee;
 
+    uint256 public rainPast24h;
+    uint256 public locationKey;
+
     event RequestRainFulfilled(bytes32 indexed requestId, uint256 indexed rain);
+    event RequestLocationFulfilled(
+        bytes32 indexed requestId,
+        uint256 indexed key
+    );
 
     constructor(
         address _link,
@@ -29,6 +30,29 @@ contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
         setChainlinkOracle(_oracle);
         weatherJobId = _weatherJobId;
         fee = _fee;
+    }
+
+    function requestLocationKey() public onlyOwner {
+        Chainlink.Request memory req = buildChainlinkRequest(
+            weatherJobId,
+            address(this),
+            this.fulfillLocationKey.selector
+        );
+        req.add(
+            "get",
+            "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&q=53.551085%2C9.993682"
+        );
+        req.add("path", "Key");
+        req.addInt("times", 1);
+        sendChainlinkRequest(req, fee);
+    }
+
+    function fulfillLocationKey(bytes32 _requestId, uint256 _locationKey)
+        public
+        recordChainlinkFulfillment(_requestId)
+    {
+        emit RequestLocationFulfilled(_requestId, _locationKey);
+        locationKey = _locationKey;
     }
 
     function requestRainPast24h() public onlyOwner {

@@ -16,6 +16,12 @@ def main():
         {"from": account},
         publish_source=False,
     )
+    print(f"Current location key is {happy_holiday.locationKey()}")
+    tx = happy_holiday.requestLocationKey({"from": account})
+    tx.wait(1)
+    time.sleep(60)
+    print(f"Current location key is {happy_holiday.locationKey()}")
+
     print(f"Current rain is {happy_holiday.rainPast24h()}")
     tx = happy_holiday.requestRainPast24h({"from": account})
     tx.wait(1)
