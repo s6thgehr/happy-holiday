@@ -1,59 +1,63 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.7;
+pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
-contract HappyHoliday is ChainlinkClient {
+contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
 
-    bytes32 public totalRainJobId;
-    uint256 public totalRain;
-    uint256 public fee;
+    uint256 private constant ORACLE_PAYMENT = 0 * LINK_DIVISIBILITY;
+    uint256 public currentPercipitation;
+    address private _oracle = 0x9904415Db0B70fDd242b6Fe835d2bBc155466e8e;
+    bytes32 private _jobId = "69cf5186b05a4497be74f85236e8ba34";
 
-    event TotalRain(uint256 _result);
-    event RequestRain(uint256 _request);
+    event RequestPercipitationFulfilled(
+        bytes32 indexed requestId,
+        uint256 indexed price
+    );
 
-    uint256 public constant DECIMALS = 10**18;
-    uint256 public insuredValue;
-    uint256 public premium;
-
-    constructor(
-        address _link,
-        address _oracle,
-        bytes32 _totalRainJobId,
-        uint256 _fee
-    ) {
-        setChainlinkToken(_link);
-        setChainlinkOracle(_oracle);
-        totalRainJobId = _totalRainJobId;
-        fee = _fee;
+    constructor() ConfirmedOwner(msg.sender) {
+        setPublicChainlinkToken();
     }
 
-    function requestTotalRain(string memory _from, string memory _to) external {
+    function requestPercipitation() public onlyOwner {
         Chainlink.Request memory req = buildChainlinkRequest(
-            totalRainJobId,
+            _jobId,
             address(this),
-            this.fulfillTotalRain.selector
+            this.fulfillPercipitation.selector
         );
-        req.add("dateFrom", _from);
-        req.add("dateTo", _to);
-        req.add("method", "SUM");
-        req.add("column", "prcp");
-        sendChainlinkRequest(req, fee);
-        emit RequestRain(fee);
+        req.add(
+            "get",
+            "https://dataservice.accuweather.com/currentconditions/v1/178556?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true"
+        );
+        req.add("path", "0,PrecipitationSummary,Past24Hours,Metric,Value");
+        req.addInt("times", 1000);
+        sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
     }
 
-    function fulfillTotalRain(bytes32 _requestId, uint256 _result)
-        external
+    function fulfillPercipitation(bytes32 _requestId, uint256 _Percipitation)
+        public
         recordChainlinkFulfillment(_requestId)
     {
-        totalRain = _result;
-        emit TotalRain(_result);
+        emit RequestPercipitationFulfilled(_requestId, _Percipitation);
+        currentPercipitation = _Percipitation;
     }
 
-    function setInsuredValue(uint256 value) external {
-        insuredValue = value * DECIMALS;
-        premium = insuredValue / 100;
+    function stringToBytes32(string memory source)
+        private
+        pure
+        returns (bytes32 result)
+    {
+        bytes memory tempEmptyStringTest = bytes(source);
+        if (tempEmptyStringTest.length == 0) {
+            return 0x0;
+        }
+
+        assembly {
+            // solhint-disable-line no-inline-assembly
+            result := mload(add(source, 32))
+        }
     }
 }
