@@ -4,15 +4,32 @@ pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
+import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 
-contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
+contract HappyHoliday is
+    ChainlinkClient,
+    ConfirmedOwner,
+    KeeperCompatibleInterface
+{
     using Chainlink for Chainlink.Request;
 
-    bytes32 public weatherJobId;
+    bytes32 public rainJobId;
+    bytes32 public locationJobId;
     uint256 public fee;
 
     uint256 public rainPast24h;
     uint256 public locationKey;
+
+    uint256 public constant interval = 86400; // One day intervall
+    uint256 public lastTimeStamp;
+
+    enum PolicyStatus {
+        CREATED, // Policy is subscribed
+        RUNNING, // Policy cover is started
+        COMPLETED, // Policy cover is fin6ished without claim
+        CLAIMED, // Policy is claimed, waiting for pay out
+        PAIDOUT // Claim is paid out
+    }
 
     event RequestRainFulfilled(bytes32 indexed requestId, uint256 indexed rain);
     event RequestLocationFulfilled(
@@ -23,25 +40,26 @@ contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
     constructor(
         address _link,
         address _oracle,
-        bytes32 _weatherJobId,
+        bytes32 _rainJobId,
+        bytes32 _locationJobId,
         uint256 _fee
     ) ConfirmedOwner(msg.sender) {
         setChainlinkToken(_link);
         setChainlinkOracle(_oracle);
-        weatherJobId = _weatherJobId;
+        rainJobId = _rainJobId;
+        locationJobId = _locationJobId;
         fee = _fee;
+        lastTimeStamp = block.timestamp;
     }
 
-    function requestLocationKey() public onlyOwner {
+    /**********  REQUEST ORACLE DATA **********/
+    function requestLocationKey(string memory url) public onlyOwner {
         Chainlink.Request memory req = buildChainlinkRequest(
-            weatherJobId,
+            locationJobId,
             address(this),
             this.fulfillLocationKey.selector
         );
-        req.add(
-            "get",
-            "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&q=53.551085%2C9.993682"
-        );
+        req.add("get", url);
         req.add("path", "Key");
         req.addInt("times", 1);
         sendChainlinkRequest(req, fee);
@@ -55,16 +73,13 @@ contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
         locationKey = _locationKey;
     }
 
-    function requestRainPast24h() public onlyOwner {
+    function requestRainPast24h(string memory url) public onlyOwner {
         Chainlink.Request memory req = buildChainlinkRequest(
-            weatherJobId,
+            rainJobId,
             address(this),
             this.fulfillRainPast24h.selector
         );
-        req.add(
-            "get",
-            "https://dataservice.accuweather.com/currentconditions/v1/178556?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true"
-        );
+        req.add("get", url);
         req.add("path", "0,PrecipitationSummary,Past24Hours,Metric,Value");
         req.addInt("times", 1000);
         sendChainlinkRequest(req, fee);
@@ -78,6 +93,31 @@ contract HappyHoliday is ChainlinkClient, ConfirmedOwner {
         rainPast24h = _rainPast24h;
     }
 
+    /**********  CHAINLINK KEEPER FUNCTIONS **********/
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    )
+        external
+        view
+        override
+        returns (
+            bool upkeepNeeded,
+            bytes memory /* performData */
+        )
+    {
+        upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+    }
+
+    function performUpkeep(
+        bytes calldata /* performData */
+    ) external override {
+        if ((block.timestamp - lastTimeStamp) > interval) {
+            lastTimeStamp = block.timestamp;
+            // Check for every policy the rain data for the day
+        }
+    }
+
+    /**********  HELPER FUNCTIONS **********/
     function stringToBytes32(string memory source)
         private
         pure

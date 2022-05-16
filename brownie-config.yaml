@@ -6,16 +6,11 @@ compiler:
       - "@chainlink=smartcontractkit/chainlink-brownie-contracts@0.4.1"
 dotenv: .env
 networks:
-  default: development
-  development:
-    av_temp_job: "c6f853860b4f479fbda0910350d695b6"
-    total_rain_job: "e9c41111b74f454695abd471806d9c6f"
-    hail_job: "941cb4bdd6e746cd933a37c8e92f2f98"
-    fee: 1000000000000000000
   rinkeby:
     link_token: "0x01BE23585060835E02B77ef475b0Cc51aA1e0709"
     fee: 0
     oracle: "0x9904415Db0B70fDd242b6Fe835d2bBc155466e8e"
-    total_rain_job: "69cf5186b05a4497be74f85236e8ba34"
+    rain_job: "cb595a4d83074a649bf7e362b6e74f41"
+    location_job: "9a06f8e911874c55bf422d0d19a968b3"
 wallets:
   from_key: ${PRIVATE_KEY}
