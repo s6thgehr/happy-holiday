@@ -252,6 +252,7 @@ contract HappyHoliday is
 
     function getRequestUrl(Policy memory policy)
         internal
+        pure
         returns (string memory)
     {
         uint256 locationKey = policy.locationKey;
@@ -261,10 +262,12 @@ contract HappyHoliday is
                 bytes(
                     "https://dataservice.accuweather.com/currentconditions/v1/"
                 ),
-                bytes(locationKey),
+                bytes(abi.encodePacked(locationKey)),
                 bytes("?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true")
             )
         );
+
+        return requestUrl;
     }
 
     /**********  HELPER FUNCTIONS **********/
