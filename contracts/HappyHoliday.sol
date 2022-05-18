@@ -18,8 +18,8 @@ contract HappyHoliday is
     uint256 public fee;
     int256 constant rainMultiplier = 1000;
 
-    uint256 public rainPast24h;
-    uint256 public locationKey;
+    // uint256 public rainPast24h;
+    // uint256 public locationKey;
 
     uint256 public constant interval = 86400; // One day intervall
     uint256 public lastTimeStamp;
@@ -244,10 +244,27 @@ contract HappyHoliday is
             }
 
             if (policy.status == PolicyStatus.RUNNING) {
-                string memory requestUrl = "";
+                string memory requestUrl = getRequestUrl(policy);
                 requestRainPast24h(requestUrl, policy);
             }
         }
+    }
+
+    function getRequestUrl(Policy memory policy)
+        internal
+        returns (string memory)
+    {
+        uint256 locationKey = policy.locationKey;
+
+        string memory requestUrl = string(
+            bytes.concat(
+                bytes(
+                    "https://dataservice.accuweather.com/currentconditions/v1/"
+                ),
+                bytes(locationKey),
+                bytes("?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true")
+            )
+        );
     }
 
     /**********  HELPER FUNCTIONS **********/
