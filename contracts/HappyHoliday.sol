@@ -45,10 +45,12 @@ contract HappyHoliday is
         uint256 rainTreshold;
         uint8 incidentsTreshold;
         uint8 incidents;
+        PolicyStatus status;
     }
 
     mapping(uint256 => address) policyIdToBuyer;
     mapping(address => uint256) buyerPolicyCount; // Number of policies someone bought
+    mapping(bytes32 => Policy) requestIdToPolicy;
 
     Policy[] public policies;
 
@@ -58,6 +60,12 @@ contract HappyHoliday is
         uint256 indexed key
     );
     event PolicySubscription(address indexed beneficiary, uint256 indexed id);
+    event IncidentReported(uint256 indexed id, uint8 indexed incidents);
+    event PolicyPaidOut(
+        address indexed beneficiary,
+        uint256 indexed id,
+        uint256 indexed insuredValue
+    );
 
     constructor(
         address _link,
@@ -101,6 +109,7 @@ contract HappyHoliday is
     function subscribePolicy(
         uint256 _startDate,
         uint256 _endDate,
+        uint256 _locationKey,
         uint256 _insuredValue,
         uint256 _premium,
         uint8 _incidentsTreshold
@@ -108,9 +117,6 @@ contract HappyHoliday is
         require(_premium == msg.value, "You have to pay the exact Premium");
 
         uint256 _rainThreshold = uint256(50 * rainMultiplier); // 50 mm rain
-
-        // Get locationKey: _locationKey
-        uint256 _locationKey = 0;
 
         Policy memory policy = Policy({
             id: policyId,
@@ -122,7 +128,8 @@ contract HappyHoliday is
             premium: _premium,
             rainTreshold: _rainThreshold,
             incidentsTreshold: _incidentsTreshold,
-            incidents: 0
+            incidents: 0,
+            status: PolicyStatus.CREATED
         });
 
         policyIdToBuyer[policyId] = msg.sender;
@@ -134,27 +141,30 @@ contract HappyHoliday is
     }
 
     /**********  REQUEST ORACLE DATA **********/
-    function requestLocationKey(string memory url) public onlyOwner {
-        Chainlink.Request memory req = buildChainlinkRequest(
-            locationJobId,
-            address(this),
-            this.fulfillLocationKey.selector
-        );
-        req.add("get", url);
-        req.add("path", "Key");
-        req.addInt("times", 1);
-        sendChainlinkRequest(req, fee);
-    }
+    // function requestLocationKey(string memory url) public onlyOwner {
+    //     Chainlink.Request memory req = buildChainlinkRequest(
+    //         locationJobId,
+    //         address(this),
+    //         this.fulfillLocationKey.selector
+    //     );
+    //     req.add("get", url);
+    //     req.add("path", "Key");
+    //     req.addInt("times", 1);
+    //     sendChainlinkRequest(req, fee);
+    // }
 
-    function fulfillLocationKey(bytes32 _requestId, uint256 _locationKey)
+    // function fulfillLocationKey(bytes32 _requestId, uint256 _locationKey)
+    //     public
+    //     recordChainlinkFulfillment(_requestId)
+    // {
+    //     emit RequestLocationFulfilled(_requestId, _locationKey);
+    //     locationKey = _locationKey;
+    // }
+
+    function requestRainPast24h(string memory url, Policy memory policy)
         public
-        recordChainlinkFulfillment(_requestId)
+        onlyOwner
     {
-        emit RequestLocationFulfilled(_requestId, _locationKey);
-        locationKey = _locationKey;
-    }
-
-    function requestRainPast24h(string memory url) public onlyOwner {
         Chainlink.Request memory req = buildChainlinkRequest(
             rainJobId,
             address(this),
@@ -163,7 +173,9 @@ contract HappyHoliday is
         req.add("get", url);
         req.add("path", "0,PrecipitationSummary,Past24Hours,Metric,Value");
         req.addInt("times", rainMultiplier);
-        sendChainlinkRequest(req, fee);
+        bytes32 requestId = sendChainlinkRequest(req, fee);
+
+        requestIdToPolicy[requestId] = policy;
     }
 
     function fulfillRainPast24h(bytes32 _requestId, uint256 _rainPast24h)
@@ -171,7 +183,23 @@ contract HappyHoliday is
         recordChainlinkFulfillment(_requestId)
     {
         emit RequestRainFulfilled(_requestId, _rainPast24h);
-        rainPast24h = _rainPast24h;
+        Policy storage policy = requestIdToPolicy[_requestId];
+        if (policy.rainTreshold >= _rainPast24h) {
+            emit IncidentReported(policy.id, policy.incidents);
+            policy.incidents++;
+        }
+        if (policy.incidents >= policy.incidentsTreshold) {
+            policy.status == PolicyStatus.CLAIMED;
+            payOut(policy);
+        }
+    }
+
+    function payOut(Policy storage policy) internal {
+        address payable beneficiary = policy.beneficiary;
+        require(address(this).balance > policy.insuredValue);
+        beneficiary.transfer(policy.insuredValue);
+        policy.status == PolicyStatus.PAIDOUT;
+        emit PolicyPaidOut(beneficiary, policy.id, policy.insuredValue);
     }
 
     /**********  CHAINLINK KEEPER FUNCTIONS **********/
@@ -194,7 +222,31 @@ contract HappyHoliday is
     ) external override {
         if ((block.timestamp - lastTimeStamp) > interval) {
             lastTimeStamp = block.timestamp;
-            // Check for every policy the rain data for the day
+            UpdatePolicies();
+        }
+    }
+
+    function UpdatePolicies() internal {
+        for (uint256 i = 0; i < policies.length; i++) {
+            Policy storage policy = policies[i];
+
+            if (
+                (policy.startDate <= block.timestamp &&
+                    policy.endDate >= block.timestamp) &&
+                policy.status == PolicyStatus.CREATED
+            ) {
+                policy.status == PolicyStatus.RUNNING;
+            } else if (
+                policy.endDate < block.timestamp &&
+                policy.status == PolicyStatus.RUNNING
+            ) {
+                policy.status = PolicyStatus.COMPLETED;
+            }
+
+            if (policy.status == PolicyStatus.RUNNING) {
+                string memory requestUrl = "";
+                requestRainPast24h(requestUrl, policy);
+            }
         }
     }
 
