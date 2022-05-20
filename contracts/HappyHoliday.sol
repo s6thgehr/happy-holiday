@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.12;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
@@ -14,7 +14,6 @@ contract HappyHoliday is
     using Chainlink for Chainlink.Request;
 
     bytes32 public rainJobId;
-    bytes32 public locationJobId;
     uint256 public fee;
     int256 constant rainMultiplier = 1000;
 
@@ -71,13 +70,11 @@ contract HappyHoliday is
         address _link,
         address _oracle,
         bytes32 _rainJobId,
-        bytes32 _locationJobId,
         uint256 _fee
     ) ConfirmedOwner(msg.sender) {
         setChainlinkToken(_link);
         setChainlinkOracle(_oracle);
         rainJobId = _rainJobId;
-        locationJobId = _locationJobId;
         fee = _fee;
         lastTimeStamp = block.timestamp;
     }
@@ -116,7 +113,7 @@ contract HappyHoliday is
     ) public payable {
         require(_premium == msg.value, "You have to pay the exact Premium");
 
-        uint256 _rainThreshold = uint256(50 * rainMultiplier); // 50 mm rain
+        uint256 _rainThreshold = uint256(20 * rainMultiplier); // 50 mm rain
 
         Policy memory policy = Policy({
             id: policyId,
@@ -163,7 +160,6 @@ contract HappyHoliday is
 
     function requestRainPast24h(string memory url, Policy memory policy)
         public
-        onlyOwner
     {
         Chainlink.Request memory req = buildChainlinkRequest(
             rainJobId,
@@ -257,20 +253,27 @@ contract HappyHoliday is
     {
         uint256 locationKey = policy.locationKey;
 
-        string memory requestUrl = string(
-            bytes.concat(
-                bytes(
-                    "https://dataservice.accuweather.com/currentconditions/v1/"
-                ),
-                bytes(abi.encodePacked(locationKey)),
-                bytes("?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true")
-            )
-        );
+        string memory requestUrl = concatenate(locationKey);
 
         return requestUrl;
     }
 
+    function concatenate(uint256 locationKey)
+        public
+        pure
+        returns (string memory)
+    {
+        string
+            memory url1 = "https://dataservice.accuweather.com/currentconditions/v1/";
+        string
+            memory url2 = "?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true";
+        string memory locationKeyString = uint2str(locationKey);
+        bytes32 locationKeyb32 = stringToBytes32(locationKeyString);
+        return string(bytes.concat(bytes(url1), locationKeyb32, bytes(url2)));
+    }
+
     /**********  HELPER FUNCTIONS **********/
+
     function stringToBytes32(string memory source)
         private
         pure
@@ -285,5 +288,31 @@ contract HappyHoliday is
             // solhint-disable-line no-inline-assembly
             result := mload(add(source, 32))
         }
+    }
+
+    function uint2str(uint256 _i)
+        internal
+        pure
+        returns (string memory _uintAsString)
+    {
+        if (_i == 0) {
+            return "0";
+        }
+        uint256 j = _i;
+        uint256 len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint256 k = len;
+        while (_i != 0) {
+            k = k - 1;
+            uint8 temp = (48 + uint8(_i - (_i / 10) * 10));
+            bytes1 b1 = bytes1(temp);
+            bstr[k] = b1;
+            _i /= 10;
+        }
+        return string(bstr);
     }
 }
