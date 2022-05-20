@@ -40,9 +40,13 @@ def main():
     my_policies = happy_holiday.getPoliciesByBuyer(account.address)
     print(f"My policies are {my_policies}")
 
+    print(f"Current rain data is {happy_holiday.rainPast24h()}")
     rain_url = "https://dataservice.accuweather.com/currentconditions/v1/170335?apikey=QkYJm5wAyNcQj2hiGekh7ObX8YopTsb2&details=true"
-    tx = happy_holiday.requestRainPast24h(rain_url, my_policies[0], {"from": account})
+    tx = happy_holiday.requestRainPast24h(
+        rain_url, my_policies[0][0], {"from": account}
+    )
     tx.wait(1)
     time.sleep(60)
     my_policies = happy_holiday.getPoliciesByBuyer(account.address)
     print(f"My policies are {my_policies}")
+    print(f"Current rain data is {happy_holiday.rainPast24h()}")

@@ -17,7 +17,7 @@ contract HappyHoliday is
     uint256 public fee;
     int256 constant rainMultiplier = 1000;
 
-    // uint256 public rainPast24h;
+    uint256 public rainPast24h;
     // uint256 public locationKey;
 
     uint256 public constant interval = 86400; // One day intervall
@@ -49,7 +49,7 @@ contract HappyHoliday is
 
     mapping(uint256 => address) policyIdToBuyer;
     mapping(address => uint256) buyerPolicyCount; // Number of policies someone bought
-    mapping(bytes32 => Policy) requestIdToPolicy;
+    mapping(bytes32 => uint256) requestIdToPolicyId;
 
     Policy[] public policies;
 
@@ -113,7 +113,7 @@ contract HappyHoliday is
     ) public payable {
         require(_premium == msg.value, "You have to pay the exact Premium");
 
-        uint256 _rainThreshold = uint256(20 * rainMultiplier); // 50 mm rain
+        uint256 _rainThreshold = uint256(20 * rainMultiplier); // 20 mm rain
 
         Policy memory policy = Policy({
             id: policyId,
@@ -158,9 +158,7 @@ contract HappyHoliday is
     //     locationKey = _locationKey;
     // }
 
-    function requestRainPast24h(string memory url, Policy memory policy)
-        public
-    {
+    function requestRainPast24h(string memory url, uint256 _policyId) public {
         Chainlink.Request memory req = buildChainlinkRequest(
             rainJobId,
             address(this),
@@ -171,7 +169,8 @@ contract HappyHoliday is
         req.addInt("times", rainMultiplier);
         bytes32 requestId = sendChainlinkRequest(req, fee);
 
-        requestIdToPolicy[requestId] = policy;
+        // Policy storage policy = policies[_policyId];
+        requestIdToPolicyId[requestId] = _policyId;
     }
 
     function fulfillRainPast24h(bytes32 _requestId, uint256 _rainPast24h)
@@ -179,10 +178,11 @@ contract HappyHoliday is
         recordChainlinkFulfillment(_requestId)
     {
         emit RequestRainFulfilled(_requestId, _rainPast24h);
-        Policy storage policy = requestIdToPolicy[_requestId];
-        if (policy.rainTreshold >= _rainPast24h) {
+        Policy storage policy = policies[requestIdToPolicyId[_requestId]];
+        if (policy.rainTreshold <= _rainPast24h) {
             emit IncidentReported(policy.id, policy.incidents);
             policy.incidents++;
+            rainPast24h = _rainPast24h;
         }
         if (policy.incidents >= policy.incidentsTreshold) {
             policy.status == PolicyStatus.CLAIMED;
@@ -240,17 +240,18 @@ contract HappyHoliday is
             }
 
             if (policy.status == PolicyStatus.RUNNING) {
-                string memory requestUrl = getRequestUrl(policy);
-                requestRainPast24h(requestUrl, policy);
+                string memory requestUrl = getRequestUrl(policy.id);
+                requestRainPast24h(requestUrl, policy.id);
             }
         }
     }
 
-    function getRequestUrl(Policy memory policy)
+    function getRequestUrl(uint256 _policyId)
         internal
-        pure
+        view
         returns (string memory)
     {
+        Policy memory policy = policies[_policyId];
         uint256 locationKey = policy.locationKey;
 
         string memory requestUrl = concatenate(locationKey);
