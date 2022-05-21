@@ -95,6 +95,7 @@ class HomePageDesktop extends ConsumerWidget {
     return Scaffold(
       // extendBodyBehindAppBar: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 8,
         // title: const Text("Happy Holiday"),
         centerTitle: false,
@@ -131,7 +132,11 @@ class HomePageDesktop extends ConsumerWidget {
                   const SizedBox(
                     width: 64,
                   ),
-                  const Text('Smart Contract Stats'),
+                  InkWell(
+                      onTap: () {
+                        context.router.push(const SmartContractRoute());
+                      },
+                      child: const Text('Smart Contract Stats')),
                 ],
               ),
             ),

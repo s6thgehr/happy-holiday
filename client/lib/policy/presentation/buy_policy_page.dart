@@ -1,10 +1,12 @@
 import 'dart:ui';
+import 'package:auto_route/auto_route.dart';
 import 'package:client/auth/application/auth_notifier.dart';
 import 'package:client/auth/domain/auth_failure.dart';
 import 'package:client/auth/presentation/connect_wallet_button.dart';
 import 'package:client/auth/shared/providers.dart';
 import 'package:client/core/contents.dart';
 import 'package:client/core/responsive.dart';
+import 'package:client/core/routes/app_router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -93,6 +95,7 @@ class BuyPolicyPageDesktop extends ConsumerWidget {
     return Scaffold(
       // extendBodyBehindAppBar: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 8,
         // title: const Text("Happy Holiday"),
         centerTitle: false,
@@ -112,19 +115,27 @@ class BuyPolicyPageDesktop extends ConsumerWidget {
         actions: const [ConnectWalletButton()],
         title: Row(
           children: [
-            const Expanded(
-              child: Text('Happy Holiday'),
+            Expanded(
+              child: InkWell(
+                  onTap: () {
+                    context.router.push(const HomeRoute());
+                  },
+                  child: const Text('Happy Holiday')),
               flex: 1,
             ),
             Expanded(
               flex: 1,
               child: Row(
-                children: const [
-                  Text('Buy your policy'),
-                  SizedBox(
+                children: [
+                  const Text('Buy your policy'),
+                  const SizedBox(
                     width: 64,
                   ),
-                  Text('Smart Contract Stats'),
+                  InkWell(
+                      onTap: () {
+                        context.router.push(const SmartContractRoute());
+                      },
+                      child: const Text('Smart Contract Stats')),
                 ],
               ),
             ),
