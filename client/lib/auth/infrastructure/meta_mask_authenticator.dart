@@ -15,6 +15,9 @@ class MetaMaskAuthenticator {
     if (eth == null) {
       return left(const AuthFailure.metaMask("MetaMask is not available."));
     }
+    // if (eth.chainId != 4) {
+    //   return left(const AuthFailure.chainId("Please use the Rinkeby Network"));
+    // }
 
     final credentials = await eth.requestAccount();
 

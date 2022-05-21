@@ -1,29 +1,27 @@
 import 'dart:ui';
-import 'package:auto_route/auto_route.dart';
 import 'package:client/auth/application/auth_notifier.dart';
 import 'package:client/auth/domain/auth_failure.dart';
 import 'package:client/auth/presentation/connect_wallet_button.dart';
 import 'package:client/auth/shared/providers.dart';
 import 'package:client/core/contents.dart';
 import 'package:client/core/responsive.dart';
-import 'package:client/core/routes/app_router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+class SmartContractPage extends StatelessWidget {
+  const SmartContractPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return const ResponsiveWidget(
-      desktopScreen: HomePageDesktop(),
+      desktopScreen: SmartContractDesktop(),
     );
   }
 }
 
-class HomePageDesktop extends ConsumerWidget {
-  const HomePageDesktop({Key? key}) : super(key: key);
+class SmartContractDesktop extends ConsumerWidget {
+  const SmartContractDesktop({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -121,17 +119,12 @@ class HomePageDesktop extends ConsumerWidget {
             Expanded(
               flex: 1,
               child: Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      context.router.push(const BuyPolicyRoute());
-                    },
-                    child: const Text('Buy your policy'),
-                  ),
-                  const SizedBox(
+                children: const [
+                  Text('Buy your policy'),
+                  SizedBox(
                     width: 64,
                   ),
-                  const Text('Smart Contract Stats'),
+                  Text('Smart Contract Stats'),
                 ],
               ),
             ),

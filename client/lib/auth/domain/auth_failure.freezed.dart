@@ -20,32 +20,38 @@ mixin _$AuthFailure {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String? message) metaMask,
+    required TResult Function(String? message) chainId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(String? message)? metaMask,
+    TResult Function(String? message)? chainId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String? message)? metaMask,
+    TResult Function(String? message)? chainId,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MetaMask value) metaMask,
+    required TResult Function(_ChainId value) chainId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_MetaMask value)? metaMask,
+    TResult Function(_ChainId value)? chainId,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MetaMask value)? metaMask,
+    TResult Function(_ChainId value)? chainId,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -148,6 +154,7 @@ class _$_MetaMask extends _MetaMask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String? message) metaMask,
+    required TResult Function(String? message) chainId,
   }) {
     return metaMask(message);
   }
@@ -156,6 +163,7 @@ class _$_MetaMask extends _MetaMask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(String? message)? metaMask,
+    TResult Function(String? message)? chainId,
   }) {
     return metaMask?.call(message);
   }
@@ -164,6 +172,7 @@ class _$_MetaMask extends _MetaMask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String? message)? metaMask,
+    TResult Function(String? message)? chainId,
     required TResult orElse(),
   }) {
     if (metaMask != null) {
@@ -176,6 +185,7 @@ class _$_MetaMask extends _MetaMask {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_MetaMask value) metaMask,
+    required TResult Function(_ChainId value) chainId,
   }) {
     return metaMask(this);
   }
@@ -184,6 +194,7 @@ class _$_MetaMask extends _MetaMask {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(_MetaMask value)? metaMask,
+    TResult Function(_ChainId value)? chainId,
   }) {
     return metaMask?.call(this);
   }
@@ -192,6 +203,7 @@ class _$_MetaMask extends _MetaMask {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_MetaMask value)? metaMask,
+    TResult Function(_ChainId value)? chainId,
     required TResult orElse(),
   }) {
     if (metaMask != null) {
@@ -210,5 +222,140 @@ abstract class _MetaMask extends AuthFailure {
   @override
   @JsonKey(ignore: true)
   _$MetaMaskCopyWith<_MetaMask> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$ChainIdCopyWith<$Res> implements $AuthFailureCopyWith<$Res> {
+  factory _$ChainIdCopyWith(_ChainId value, $Res Function(_ChainId) then) =
+      __$ChainIdCopyWithImpl<$Res>;
+  @override
+  $Res call({String? message});
+}
+
+/// @nodoc
+class __$ChainIdCopyWithImpl<$Res> extends _$AuthFailureCopyWithImpl<$Res>
+    implements _$ChainIdCopyWith<$Res> {
+  __$ChainIdCopyWithImpl(_ChainId _value, $Res Function(_ChainId) _then)
+      : super(_value, (v) => _then(v as _ChainId));
+
+  @override
+  _ChainId get _value => super._value as _ChainId;
+
+  @override
+  $Res call({
+    Object? message = freezed,
+  }) {
+    return _then(_ChainId(
+      message == freezed
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_ChainId extends _ChainId {
+  const _$_ChainId([this.message]) : super._();
+
+  @override
+  final String? message;
+
+  @override
+  String toString() {
+    return 'AuthFailure.chainId(message: $message)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ChainId &&
+            const DeepCollectionEquality().equals(other.message, message));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(message));
+
+  @JsonKey(ignore: true)
+  @override
+  _$ChainIdCopyWith<_ChainId> get copyWith =>
+      __$ChainIdCopyWithImpl<_ChainId>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String? message) metaMask,
+    required TResult Function(String? message) chainId,
+  }) {
+    return chainId(message);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function(String? message)? metaMask,
+    TResult Function(String? message)? chainId,
+  }) {
+    return chainId?.call(message);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String? message)? metaMask,
+    TResult Function(String? message)? chainId,
+    required TResult orElse(),
+  }) {
+    if (chainId != null) {
+      return chainId(message);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_MetaMask value) metaMask,
+    required TResult Function(_ChainId value) chainId,
+  }) {
+    return chainId(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(_MetaMask value)? metaMask,
+    TResult Function(_ChainId value)? chainId,
+  }) {
+    return chainId?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_MetaMask value)? metaMask,
+    TResult Function(_ChainId value)? chainId,
+    required TResult orElse(),
+  }) {
+    if (chainId != null) {
+      return chainId(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ChainId extends AuthFailure {
+  const factory _ChainId([final String? message]) = _$_ChainId;
+  const _ChainId._() : super._();
+
+  @override
+  String? get message => throw _privateConstructorUsedError;
+  @override
+  @JsonKey(ignore: true)
+  _$ChainIdCopyWith<_ChainId> get copyWith =>
       throw _privateConstructorUsedError;
 }
