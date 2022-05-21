@@ -182,12 +182,12 @@ contract HappyHoliday is
         if (policy.rainTreshold <= _rainPast24h) {
             emit IncidentReported(policy.id, policy.incidents);
             policy.incidents++;
-            rainPast24h = _rainPast24h;
         }
         if (policy.incidents >= policy.incidentsTreshold) {
             policy.status == PolicyStatus.CLAIMED;
             payOut(policy);
         }
+        rainPast24h = _rainPast24h;
     }
 
     function payOut(Policy storage policy) internal {

@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:client/auth/application/auth_notifier.dart';
 import 'package:client/auth/domain/auth_failure.dart';
@@ -145,54 +144,51 @@ class BuyPolicyPageDesktop extends ConsumerWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
               height: 1200,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(
-                    "https://images.unsplash.com/photo-1487349384428-12b47aca925e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-                  ),
-                ),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      screenSize.width / 8,
-                      32 + screenSize.width / 64 * screenSize.height / 128,
-                      screenSize.width / 8,
-                      16),
-                  child: Column(
-                    children: [
-                      Text(
-                        introMessage,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: screenSize.width / 40,
-                            color: Colors.grey.shade700),
+              // decoration: const BoxDecoration(
+              //   image: DecorationImage(
+              //     fit: BoxFit.cover,
+              //     image: NetworkImage(
+              //       "https://images.unsplash.com/photo-1487349384428-12b47aca925e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
+              //     ),
+              //   ),
+              // ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                    screenSize.width / 8,
+                    32 + screenSize.width / 64 * screenSize.height / 128,
+                    screenSize.width / 8,
+                    16),
+                child: Column(
+                  children: [
+                    Text(
+                      'Your contracts',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: screenSize.width / 40,
+                          color: Colors.grey.shade700),
+                    ),
+                    SizedBox(height: screenSize.width / 32),
+                    Text(
+                      welcomeMessage,
+                      style: TextStyle(
+                        fontSize: screenSize.width / 32,
+                        color: Colors.pink.shade700,
                       ),
-                      SizedBox(height: screenSize.width / 32),
-                      Text(
-                        welcomeMessage,
-                        style: TextStyle(
-                          fontSize: screenSize.width / 32,
-                          color: Colors.pink.shade700,
-                        ),
+                    ),
+                    SizedBox(height: screenSize.width / 32),
+                    Text(
+                      happyHolidayMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: screenSize.width / 64,
+                        color: Colors.grey.shade700,
                       ),
-                      SizedBox(height: screenSize.width / 32),
-                      Text(
-                        happyHolidayMessage,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: screenSize.width / 64,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                      SizedBox(height: screenSize.width / 32),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: screenSize.width / 32),
+                  ],
                 ),
               ),
             ),
