@@ -6,6 +6,7 @@ import 'package:client/auth/shared/providers.dart';
 import 'package:client/core/contents.dart';
 import 'package:client/core/responsive.dart';
 import 'package:client/core/routes/app_router.gr.dart';
+import 'package:client/policy/shared/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -21,12 +22,27 @@ class BuyPolicyPage extends StatelessWidget {
   }
 }
 
-class BuyPolicyPageDesktop extends ConsumerWidget {
-  const BuyPolicyPageDesktop({Key? key}) : super(key: key);
+class BuyPolicyPageDesktop extends ConsumerStatefulWidget {
+  const BuyPolicyPageDesktop({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BuyPolicyPageDesktop> createState() => _BuyPolicyDesktopState();
+}
+
+class _BuyPolicyDesktopState extends ConsumerState<BuyPolicyPageDesktop> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+        () => ref.watch(policyNotifierProvider.notifier).getPolicies());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final state = ref.watch(policyNotifierProvider);
     ref.listen(
       authNotifierProvider,
       ((previous, next) {
@@ -172,7 +188,11 @@ class BuyPolicyPageDesktop extends ConsumerWidget {
                     ),
                     SizedBox(height: screenSize.width / 32),
                     Text(
-                      welcomeMessage,
+                      state.map(
+                          initial: (_) => 'Initial',
+                          loadInProgress: (_) => 'LoadInProgress',
+                          loadSuccess: (_) => '${_.policies.first.premium}',
+                          loadFailure: (_) => 'Failure'),
                       style: TextStyle(
                         fontSize: screenSize.width / 32,
                         color: Colors.pink.shade700,
